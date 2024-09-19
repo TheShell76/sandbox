@@ -35,7 +35,11 @@ jobs:
         id: meta
         run: |
           echo "name=$(helm show chart ${{ env.CHART_PATH }} | grep 'name:' | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-          echo "tag=0.1.1" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "tag=$(echo '${{ github.ref_name }}' | awk -F '-' '{print $2}')" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=0.0.0-${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name:  Build and push Helm chart
         uses: appany/helm-oci-chart-releaser@v0.4.2
