@@ -10,6 +10,8 @@ on:
 env:
   REGISTRY: ghcr.io
   REPO_NAME: ${{ github.repository_owner }}/helm
+  CHART_PATH: chart
+  UPDATE_DEPS: 'false'
 
 jobs:
   build-and-push-image:
@@ -32,7 +34,7 @@ jobs:
       - name: Extract metadata (chart name, tag)
         id: meta
         run: |
-          echo "name=sandbox" >> "$GITHUB_OUTPUT"
+          echo "name=$(helm show chart ${{ env.CHART_PATH }} | grep 'name:' | awk '{print $2}')" >> "$GITHUB_OUTPUT"
           echo "tag=0.1.1" >> "$GITHUB_OUTPUT"
 
       - name:  Build and push Helm chart
@@ -41,8 +43,8 @@ jobs:
           name: ${{ steps.meta.outputs.name }}
           repository: ${{ env.REPO_NAME }}
           tag: ${{ steps.meta.outputs.tag }}
-          path: chart
+          path: ${{ env.CHART_PATH }}
           registry: ${{ env.REGISTRY }}
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          update_dependencies: 'false'
+          update_dependencies: '${{ env.UPDATE_DEPS }}'
