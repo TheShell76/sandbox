@@ -1,0 +1,12 @@
+#!/bin/bash
+
+. ./devel/bin/config.sh run
+
+DOCKER_ARGS="$DOCKER_ARGS \
+    --name $DOCKER_NAME \
+    -p $LOCAL_PORT:80"
+
+docker run -ti --rm \
+    $DOCKER_ARGS \
+    $DOCKER_IMG:$DOCKER_TAG \
+    $@
