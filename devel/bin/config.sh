@@ -20,6 +20,9 @@ fi
 if [ -z "$LOCAL_PORT" ]; then
     LOCAL_PORT="8000"
 fi
+if [ -z "$HELM_CHART" ]; then
+    HELM_CHART="./chart"
+fi
 if [ -z "$HELM_NS" ]; then
     HELM_NS="default"
 fi
