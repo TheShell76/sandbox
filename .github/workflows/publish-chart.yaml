@@ -11,7 +11,7 @@ on:
 # Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
 env:
   REGISTRY: ghcr.io
-  REPO_NAME: ${{ github.repository_owner }}/helm
+  REPO_NAME: ${{ github.repository_owner }}/sandbox
 
 # There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
@@ -36,7 +36,7 @@ jobs:
       - name: Chart | Push
         uses: appany/helm-oci-chart-releaser@v0.4.2
         with:
-          name: sandbox
+          name: helm
           repository: ${{ env.REPO_NAME }}
           tag: 0.1.0
           path: chart
