@@ -10,10 +10,12 @@ on:
 env:
   CHART_PATH: chart
   UPDATE_DEPS: 'false'
-  DHUB_NAME: theshell
+  # GitHub Container registry
+  GHCR_NAME: ${{ github.repository_owner }}/helm
+  # Docker Hub
+  DHUB_NAME: theshell/helm
   DHUB_USERNAME: ${{ secrets.THESHELL_DOCKER_USERNAME }}
   DHUB_PASSWORD: ${{ secrets.THESHELL_DOCKER_PASSWORD }}
-  GHCR_NAME: ${{ github.repository_owner }}/helm
 
 jobs:
   build-and-push-image:
@@ -40,18 +42,6 @@ jobs:
           else
             echo "tag=0.0.0-${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
-      
-      - name:  Build and push Helm chart to Docker Hub
-        uses: appany/helm-oci-chart-releaser@v0.4.2
-        with:
-          path: ${{ env.CHART_PATH }}
-          update_dependencies: '${{ env.UPDATE_DEPS }}'
-          name: ${{ steps.meta.outputs.name }}
-          tag: ${{ steps.meta.outputs.tag }}
-          registry: registry-1.docker.io
-          registry_username: ${{ env.DHUB_USERNAME }}
-          registry_password: ${{ env.DHUB_PASSWORD }}
-          repository: ${{ env.DHUB_NAME }}
 
       - name:  Build and push Helm chart to Container registry
         uses: appany/helm-oci-chart-releaser@v0.4.2
@@ -64,3 +54,15 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ env.GHCR_NAME }}
+
+      - name:  Build and push Helm chart to Docker Hub
+        uses: appany/helm-oci-chart-releaser@v0.4.2
+        with:
+          path: ${{ env.CHART_PATH }}
+          update_dependencies: '${{ env.UPDATE_DEPS }}'
+          name: ${{ steps.meta.outputs.name }}
+          tag: ${{ steps.meta.outputs.tag }}
+          registry: registry-1.docker.io
+          registry_username: ${{ env.DHUB_USERNAME }}
+          registry_password: ${{ env.DHUB_PASSWORD }}
+          repository: ${{ env.DHUB_NAME }}

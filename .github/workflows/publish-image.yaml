@@ -8,10 +8,12 @@ on:
     paths: ['app/**']
 
 env:
+  # GitHub Container registry
+  GHCR_NAME: ${{ github.repository_owner }}/docker/${{ github.event.repository.name }}
+  # Docker Hub
   DHUB_NAME: theshell/${{ github.event.repository.name }}
   DHUB_USERNAME: ${{ secrets.THESHELL_DOCKER_USERNAME }}
   DHUB_PASSWORD: ${{ secrets.THESHELL_DOCKER_PASSWORD }}
-  GHCR_NAME: ${{ github.repository_owner }}/docker/${{ github.event.repository.name }}
 
 jobs:
   build-and-push-image:
@@ -26,12 +28,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ env.DHUB_USERNAME }}
-          password: ${{ env.DHUB_PASSWORD }}
-
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
@@ -39,13 +35,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DHUB_USERNAME }}
+          password: ${{ env.DHUB_PASSWORD }}
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.DHUB_NAME }}
             ghcr.io/${{ env.GHCR_NAME }}
+            ${{ env.DHUB_NAME }}
           tags: |
             type=ref,event=branch
             type=match,pattern=app-(\d+.\d+.\d+),group=1
